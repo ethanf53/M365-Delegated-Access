@@ -10,7 +10,7 @@
 - Disable Focused Inbox
 - Exchange Online Protection Setup (EOP)
 - Remove contacts as trusted senders
-- Disable RTF `(Set-RemoteDomain -Identity Default -TNEFEnabled $false)`
+- Disable RTF ( `Set-RemoteDomain -Identity Default -TNEFEnabled $false`)
 ### Specific licensing
 - Encrypted e-mails setup (OME) OME Encryption Info
 - Defender for 365 Setup (For Tenants Opting In for Advanced Spam Protection)
