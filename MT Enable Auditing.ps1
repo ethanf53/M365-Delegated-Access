@@ -12,15 +12,21 @@ foreach ($customer in $customers) {
     $tokenValue = ConvertTo-SecureString "Bearer $($eachToken.AccessToken)" -AsPlainText -Force
     $eachCredential = New-Object System.Management.Automation.PSCredential($upn, $tokenValue)
     $session = New-PSSession -ConfigurationName Microsoft.Exchange -ConnectionUri "https://outlook.office365.com/powershell-liveid?DelegatedOrg=$($customer.Name)&BasicAuthToOAuthConversion=true" -Credential $eachCredential -Authentication Basic -AllowRedirection
-    Import-PSSession $session -CommandName Set-AdminAuditLogConfig, Get-AdminAuditLogConfig -AllowClobber
+    Import-PSSession $session -CommandName Set-AdminAuditLogConfig, Get-AdminAuditLogConfig, Enable-OrganizationCustomization, Get-OrganizationConfig -AllowClobber
 
     #define the condition that determines whether or not the command should run
     $tenantQuery = Get-AdminAuditLogConfig
 
     if($tenantQuery.UnifiedAuditLogIngestionEnabled -eq 'true') {
         Write-Host "Audit log already enabled"
-     }else {
-        # run the command if it needs to be ran
+     }
+     elseif(Get-OrganizationConfig.IsDehydrated) {
+        Write-Host "Enabling Organization Customization (Hydrating the tenant)"
+        Enable-OrganizationCustomization
+        Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true
+        Write-Host "Enabling audit log"
+     }
+     else {
         Set-AdminAuditLogConfig -UnifiedAuditLogIngestionEnabled $true
         Write-Host "Enabling audit log"
      }
